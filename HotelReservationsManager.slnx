@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/Data/">
+    <Project Path="HotelReservationsManager.Data.Models/HotelReservationsManager.Data.Models.csproj" />
+    <Project Path="HotelReservationsManager.Data/HotelReservationsManager.Data.csproj" />
+  </Folder>
+  <Folder Name="/Services/">
+    <Project Path="HotelReservationsManager.Services/HotelReservationsManager.Services.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="HotelReservationsManager.Services.Tests/HotelReservationsManager.Services.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Web/">
+    <Project Path="HotelReservationsManager.Web/HotelReservationsManager.Web.csproj" />
+  </Folder>
+  <Project Path="HotelReservationsManager.Common/HotelReservationsManager.Common.csproj" />
+</Solution>
