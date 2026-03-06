@@ -12,36 +12,45 @@ namespace HotelReservationsManager.Data.Models
         public  int Id { get; set; }
 
         [Required]
-        [MaxLength()]
+        [MaxLength(EntityValidationsConstants.User.UsernameMaxLength)]
         public  string Username { get; set; } = null!;
 
         [Required]
+        [MaxLength(EntityValidationsConstants.User.PasswordMaxLength)]
+        [DataType(DataType.Password)]
         public string Password { get; set; } = null!;
 
         [Required]
+        [MaxLength(EntityValidationsConstants.User.NameMaxLength)]
         public string FirstName { get; set; } = null!;
 
         [Required]
-        public  string MiddleName { get; set; }
+        [MaxLength(EntityValidationsConstants.User.NameMaxLength)]
+        public string MiddleName { get; set; } = null!;
 
         [Required]
+        [MaxLength(EntityValidationsConstants.User.NameMaxLength)]
         public string LastName { get; set; } = null!;
 
-        [Required] 
+        [Required]
+        [StringLength(EntityValidationsConstants.User.EGNLength)]
         public string EGN { get; set; } = null!;
 
-        [Required] 
+        [Required,Phone]
+        [StringLength(EntityValidationsConstants.User.PhoneNumberLength)]
         public string PhoneNumber { get; set; } = null!;
 
-        [Required] 
+        [Required,EmailAddress]
+        [MaxLength(EntityValidationsConstants.User.EmailMaxLength)]
         public string Email { get; set; } = null!;
 
         [Required]
         public  DateTime HireDate { get; set; }
 
-        [Required]
-        public  bool IsActive { get; set; }
+        public bool IsActive { get; set; } = true;
 
         public DateTime?  LeavingDate { get; set; }
+
+        public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
     }
 }
