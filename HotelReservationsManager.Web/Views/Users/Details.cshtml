@@ -1,0 +1,24 @@
+@model HotelReservationsManager.Data.Models.User
+
+@{
+    ViewData["Title"] = "Детайли за потребител";
+}
+
+<h2>@Model.Username</h2>
+
+<div class="card">
+    <div class="card-body">
+        <p><strong>Име:</strong> @Model.FirstName @Model.MiddleName @Model.LastName</p>
+        <p><strong>Email:</strong> @Model.Email</p>
+        <p><strong>Телефон:</strong> @Model.PhoneNumber</p>
+        <p><strong>EGN:</strong> @Model.EGN</p>
+        <p><strong>Назначен на:</strong> @Model.HireDate.ToShortDateString()</p>
+        <p><strong>Активен:</strong> @(Model.IsActive ? "Да" : "Не")</p>
+        @if (Model.LeavingDate.HasValue)
+        {
+            <p><strong>Оставен на:</strong> @Model.LeavingDate.Value.ToShortDateString()</p>
+        }
+    </div>
+</div>
+
+<a asp-action="Index" class="btn btn-secondary mt-3">Назад</a>

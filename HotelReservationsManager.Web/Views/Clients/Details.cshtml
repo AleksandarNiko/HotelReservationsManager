@@ -1,0 +1,53 @@
+@using HotelReservationsManager.Data.Models
+@model IEnumerable<Reservation>
+
+@{
+    var client = ViewBag.Client as Client;
+    ViewData["Title"] = "Детайли за клиент";
+}
+
+<h2>@ViewData["Title"] - @client.FirstName @client.LastName</h2>
+
+<div class="card">
+    <div class="card-body">
+        <p><strong>Email:</strong> @client.Email</p>
+        <p><strong>Телефон:</strong> @client.PhoneNumber</p>
+        <p><strong>Възрастен:</strong> @(client.IsAdult ? "Да" : "Не")</p>
+
+        <h5 class="mt-4">Предишни резервации</h5>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Стая</th>
+                    <th>Настаняване</th>
+                    <th>Освобождаване</th>
+                    <th>Сума</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model)
+                {
+                    <tr>
+                        <td>@r.Room?.Number</td>
+                        <td>@r.ArrivalDate.ToShortDateString()</td>
+                        <td>@r.DepartureDate.ToShortDateString()</td>
+                        <td>@r.Sum.ToString("C")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <nav>
+            <ul class="pagination">
+                @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
+                {
+                    <li class="page-item @(i == (int)ViewBag.CurrentPage ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Details", new { id = client.Id, page = i })">@i</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<a asp-action="Index" class="btn btn-secondary mt-3">Назад</a>

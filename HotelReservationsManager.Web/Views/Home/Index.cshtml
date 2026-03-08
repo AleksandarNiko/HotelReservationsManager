@@ -1,8 +1,71 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="hero bg-primary text-white py-5 mb-4">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="display-5">Hotel Reservations Manager</h1>
+                <p class="lead">Manage rooms, customers and reservations quickly. Use the shortcuts to start working.</p>
+                <p>
+                    <a class="btn btn-light btn-lg me-2" asp-controller="Reservations" asp-action="Index">View Reservations</a>
+                    <a class="btn btn-outline-light btn-lg" asp-controller="Rooms" asp-action="Index">View Rooms</a>
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <img src="~/images/hotel-illustration.svg" alt="hotel" style="max-width:180px;" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-subtitle text-muted">Rooms</h6>
+                    <h3 class="card-title">@ViewBag.RoomsCount</h3>
+                    <p class="mb-0 text-success">@ViewBag.FreeRooms free</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-subtitle text-muted">Clients</h6>
+                    <h3 class="card-title">@ViewBag.ClientsCount</h3>
+                    <p class="mb-0">Manage your customers</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-subtitle text-muted">Reservations</h6>
+                    <h3 class="card-title">@ViewBag.ReservationsCount</h3>
+                    <p class="mb-0">Active and past bookings</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-subtitle text-muted">Quick actions</h6>
+                    <a class="btn btn-outline-primary btn-sm w-100 mb-1" asp-controller="Clients" asp-action="Create">Add Client</a>
+                    <a class="btn btn-outline-primary btn-sm w-100" asp-controller="Reservations" asp-action="Create">Add Reservation</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Recent Reservations</h5>
+            <p class="text-muted">Quick overview of latest reservations.</p>
+            @* reuse reservations partial if required; simple link for now *@
+            <p><a asp-controller="Reservations" asp-action="Index">Open reservations list</a></p>
+        </div>
+    </div>
 </div>

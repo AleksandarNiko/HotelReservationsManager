@@ -1,0 +1,72 @@
+@using HotelReservationsManager.Data.Models
+@model IEnumerable<Client>
+
+@{
+    ViewData["Title"] = "Клиенти";
+    var pageSize = ViewBag.PageSize ?? 10;
+    var sizes = ViewBag.PageSizeOptions as int[] ?? new[] { 10, 25, 50 };
+}
+
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="mb-0">Клиенти</h2>
+            <a asp-controller="Clients" asp-action="Create" class="btn btn-primary btn-sm">Нов клиент</a>
+        </div>
+
+        <form method="get" class="row g-3 mb-3">
+            <div class="col-md-4">
+                <input type="text" name="search" class="form-control" placeholder="Търси по име или email..." />
+            </div>
+            <div class="col-md-2">
+                <select name="pageSize" class="form-select">
+                    @foreach (var s in sizes)
+                    {
+                        <option value="@s" selected="@(s == pageSize ? "selected" : null)">@s</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-primary">Филтрирай</button>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Име</th>
+                        <th>Email</th>
+                        <th>Телефон</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var c in Model)
+                    {
+                        <tr>
+                            <td><strong>@c.FirstName @c.LastName</strong></td>
+                            <td><a href="mailto:@c.Email">@c.Email</a></td>
+                            <td>@c.PhoneNumber</td>
+                            <td>
+                                <a class="btn btn-sm btn-outline-warning me-1" asp-controller="Clients" asp-action="Edit" asp-route-id="@c.Id">Редактирай</a>
+                                <a class="btn btn-sm btn-outline-info" asp-controller="Clients" asp-action="Details" asp-route-id="@c.Id">Детайли</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <nav>
+            <ul class="pagination">
+                @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
+                {
+                    <li class="page-item @(i == (int)ViewBag.CurrentPage ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Index", new { page = i, pageSize = pageSize })">@i</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div>
+</div>

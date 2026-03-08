@@ -1,0 +1,27 @@
+@{
+    ViewData["Title"] = "Вход";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Login" method="post">
+    <div class="mb-3">
+        <label class="form-label">Потребителско име</label>
+        <input name="username" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Парола</label>
+        <input name="password" type="password" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Вход</button>
+</form>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="text-danger mt-3">
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <div>@error.ErrorMessage</div>
+        }
+    </div>
+}

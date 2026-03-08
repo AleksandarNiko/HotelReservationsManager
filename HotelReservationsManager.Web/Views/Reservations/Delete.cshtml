@@ -1,0 +1,30 @@
+@model HotelReservationsManager.Data.Models.Reservation
+
+@{
+    ViewData["Title"] = "Изтрий резервация";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Стая № @Model.Room?.Number</h5>
+        <p class="card-text"><strong>Настаняване:</strong> @Model.ArrivalDate.ToShortDateString()</p>
+        <p class="card-text"><strong>Освобождаване:</strong> @Model.DepartureDate.ToShortDateString()</p>
+        <p class="card-text"><strong>Сума:</strong> @Model.Sum.ToString("C")</p>
+        <p class="card-text"><strong>Клиенти:</strong></p>
+        <ul>
+            @foreach(var c in Model.Clients)
+            {
+                <li>@c.FirstName @c.LastName - @c.Email</li>
+            }
+        </ul>
+    </div>
+</div>
+
+<form asp-action="DeleteConfirmed" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" value="@Model.Id" />
+    <button class="btn btn-danger">Изтрий</button>
+    <a asp-action="Index" class="btn btn-secondary">Откажи</a>
+</form>

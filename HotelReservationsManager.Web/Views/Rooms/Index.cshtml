@@ -1,0 +1,108 @@
+@using HotelReservationsManager.Data.Models
+@model IEnumerable<Room>
+
+@{
+    ViewData["Title"] = "Стаи";
+    var pageSize = ViewBag.PageSize ?? 10;
+    var sizes = (int[])ViewBag.PageSizeOptions ?? new[] { 10, 25, 50 };
+}
+
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="mb-0">Стаи</h2>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Create" class="btn btn-primary btn-sm">Нова стая</a>
+            }
+        </div>
+
+        <form method="get" class="row g-3 mb-3">
+    <div class="col-md-3">
+        <select name="type" class="form-select">
+            <option value="">Всички типове</option>
+            @foreach (var t in Enum.GetValues(typeof(RoomType)))
+            {
+                <option value="@t">@t</option>
+            }
+        </select>
+    </div>
+        <div class="col-md-2">
+        <select name="capacity" class="form-select">
+            <option value="">Всички капацитети</option>
+            @for (int i = 1; i <= 10; i++)
+            {
+                <option value="@i">@i</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select name="isFree" class="form-select">
+            <option value="">Всички</option>
+            <option value="true">Свободни</option>
+            <option value="false">Заети</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select name="pageSize" class="form-select">
+            @foreach (var s in sizes)
+            {
+                <option value="@s" selected="@(s == pageSize ? "selected" : null)">@s</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-3">
+        <button class="btn btn-primary">Филтрирай</button>
+    </div>
+</form>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+    <thead>
+        <tr>
+            <th>Номер</th>
+            <th>Цена (възрастен)</th>
+            <th>Цена (дете/млад)</th>
+            <th>Капацитет</th>
+            <th>Свободна</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var r in Model)
+        {
+            <tr>
+                <td>@r.Number</td>
+                <td>@r.BedPriceAdult.ToString("C")</td>
+                <td>@r.BedPriceYoung.ToString("C")</td>
+                <td>@r.Capacity</td>
+                <td>@(r.IsFree ? "Да" : "Не")</td>
+                <td>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a class="btn btn-sm btn-outline-warning me-1" asp-action="Edit" asp-route-id="@r.Id">Редактирай</a>
+                        <form asp-action="Delete" method="post" class="d-inline">
+                            <input type="hidden" name="id" value="@r.Id" />
+                            <button class="btn btn-sm btn-outline-danger">Изтрий</button>
+                        </form>
+                    }
+                    <a class="btn btn-sm btn-outline-info" asp-action="Details" asp-route-id="@r.Id">Детайли</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+            </table>
+        </div>
+
+        <nav>
+            <ul class="pagination">
+                @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
+                {
+                    <li class="page-item @(i == (int)ViewBag.CurrentPage ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Index", new { page = i, pageSize = pageSize })">@i</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div>
+</div>

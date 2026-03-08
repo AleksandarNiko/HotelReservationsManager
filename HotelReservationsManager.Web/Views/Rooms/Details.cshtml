@@ -1,0 +1,20 @@
+@model HotelReservationsManager.Data.Models.Room
+
+@{
+    ViewData["Title"] = "Детайли за стая";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Стая № @Model.Number</h5>
+        <p><strong>Капацитет:</strong> @Model.Capacity</p>
+        <p><strong>Тип:</strong> @Model.Type</p>
+        <p><strong>Цена (възрастен):</strong> @Model.BedPriceAdult.ToString("C")</p>
+        <p><strong>Цена (дете/млад):</strong> @Model.BedPriceYoung.ToString("C")</p>
+        <p><strong>Свободна:</strong> @(Model.IsFree ? "Да" : "Не")</p>
+    </div>
+</div>
+
+<a asp-action="Index" class="btn btn-secondary mt-3">Назад</a>
