@@ -21,6 +21,13 @@ body {
   margin-bottom: 60px;
 }
 
+.hero {
+  background: linear-gradient(90deg, rgba(37,140,251,1) 0%, rgba(60,160,240,1) 100%);
+  color: white;
+}
+
+.card.shadow-sm { box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
   color: var(--bs-secondary-color);
   text-align: end;
