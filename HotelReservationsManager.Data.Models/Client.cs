@@ -9,7 +9,7 @@ namespace HotelReservationsManager.Data.Models
     public class Client
     {
         [Key]
-        public  int Id { get; set; }
+        public int Id { get; set; }
 
         [Required]
         [MaxLength(EntityValidationsConstants.User.NameMaxLength)]
@@ -21,13 +21,14 @@ namespace HotelReservationsManager.Data.Models
 
         [Required]
         [StringLength(EntityValidationsConstants.User.PhoneNumberLength)]
+        [RegularExpression(@"^\d+$", ErrorMessage = "Телефонният номер трябва да съдържа само цифри.")]
         public string PhoneNumber { get; set; } = null!;
 
-        [Required,EmailAddress]
+        [Required, EmailAddress]
         [MaxLength(EntityValidationsConstants.User.EmailMaxLength)]
         public string Email { get; set; } = null!;
 
-        public  bool IsAdult { get; set; }
+        public bool IsAdult { get; set; }
 
         public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
     }

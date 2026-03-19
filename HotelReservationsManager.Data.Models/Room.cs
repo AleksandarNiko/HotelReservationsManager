@@ -9,7 +9,7 @@ namespace HotelReservationsManager.Data.Models
     public class Room
     {
         [Key]
-        public  int Id { get; set; }
+        public int Id { get; set; }
 
         [Range(1, 10)]
         public int Capacity { get; set; }
@@ -20,12 +20,12 @@ namespace HotelReservationsManager.Data.Models
         public bool IsFree { get; set; } = true;
 
         [Column(TypeName = "decimal(18, 2)")]
-        public  decimal BedPriceAdult { get; set; }
+        public decimal BedPriceAdult { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
-        public  decimal BedPriceYoung { get; set; }
+        public decimal BedPriceYoung { get; set; }
 
-        public  int Number { get; set; }
+        public int Number { get; set; }
     }
 
     public enum RoomType
