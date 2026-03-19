@@ -38,7 +38,8 @@ using (var scope = app.Services.CreateScope())
             context.Users.Add(new User
             {
                 Username = "admin",
-                Password = "adminpassword", // В реална среда ползвай Hashing!
+                Password = HotelReservationsManager.Web.Controllers.AccountController.HashPassword("adminpassword"),
+                IsAdmin = true, 
                 FirstName = "Admin",
                 MiddleName = "Admin",
                 LastName = "Admin",
