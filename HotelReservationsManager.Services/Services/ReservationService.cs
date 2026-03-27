@@ -28,8 +28,8 @@ namespace HotelReservationsManager.Services.Services
             foreach (var client in clients)
             {
                 decimal nightPrice = client.IsAdult ? room.BedPriceAdult : room.BedPriceYoung;
-                if (breakfast) nightPrice += 15; 
-                if (allInc) nightPrice += 40;    
+                if (breakfast) nightPrice += 15;
+                if (allInc) nightPrice += 40;
                 total += nightPrice * nights;
             }
             return total;
@@ -54,7 +54,7 @@ namespace HotelReservationsManager.Services.Services
             var clients = await _context.Clients.Where(c => model.SelectedClientIds.Contains(c.Id)).ToListAsync();
             foreach (var client in clients) reservation.Clients.Add(client);
 
-            room.IsFree = false; 
+            room.IsFree = false;
             _context.Reservations.Add(reservation);
             await _context.SaveChangesAsync();
             return true;
