@@ -1,8 +1,11 @@
-@using HotelReservationsManager.Data.Models
+﻿@using HotelReservationsManager.Data.Models
 @model IEnumerable<Reservation>
 @{
     int currentPage = ViewBag.CurrentPage ?? 1;
     int totalPages = ViewBag.TotalPages ?? 1;
+    int pageSize = ViewBag.PageSize ?? 10;
+    var sizes = ViewBag.PageSizeOptions as int[] ?? new[] { 10, 25, 50 };
+    var search = ViewBag.Search as string ?? "";
 }
 
 <div class="card mb-4">
@@ -18,7 +21,15 @@
         <form asp-action="Index" method="get" class="mb-3">
             <div class="row g-2">
                 <div class="col-md-4">
-                    <input type="text" name="search" class="form-control" placeholder="Търси по клиент..." />
+                    <input type="text" name="search" value="@search" class="form-control" placeholder="Търси по клиент..." />
+                </div>
+                <div class="col-auto">
+                    <select name="pageSize" class="form-select">
+                        @foreach (var s in sizes)
+                        {
+                            <option value="@s" selected="@(s == pageSize ? "selected" : null)">@s</option>
+                        }
+                    </select>
                 </div>
                 <div class="col-auto">
                     <button type="submit" class="btn btn-primary">Филтрирай</button>
@@ -34,6 +45,8 @@
                         <th>Клиенти</th>
                         <th>Настаняване</th>
                         <th>Освобождаване</th>
+                        <th>Закуска</th>
+                        <th>All Incl.</th>
                         <th>Сума</th>
                         <th>Действия</th>
                     </tr>
@@ -58,7 +71,9 @@
                             </td>
                             <td>@item.ArrivalDate.ToString("dd.MM.yyyy")</td>
                             <td>@item.DepartureDate.ToString("dd.MM.yyyy")</td>
-                            <td class="text-success">@item.Sum.ToString("C")</td>
+                            <td>@(item.HasBreakfast ? "Да" : "Не")</td>
+                            <td>@(item.IsAllInclusive ? "Да" : "Не")</td>
+                            <td class="text-success fw-bold">@item.Sum.ToString("C")</td>
                             <td>
                                 <a class="btn btn-sm btn-outline-primary me-1" asp-action="Details" asp-route-id="@item.Id">Детайли</a>
                                 <a class="btn btn-sm btn-outline-warning me-1" asp-action="Edit" asp-route-id="@item.Id">Редактирай</a>
@@ -75,7 +90,7 @@
                 @for (int i = 1; i <= totalPages; i++)
                 {
                     <li class="page-item @(i == currentPage ? "active" : "")">
-                        <a class="page-link" href="@Url.Action("Index", new { page = i })">@i</a>
+                        <a class="page-link" href="@Url.Action("Index", new { page = i, pageSize = pageSize, search = search })">@i</a>
                     </li>
                 }
             </ul>

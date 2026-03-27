@@ -5,6 +5,7 @@
 <h2>@ViewData["Title"]</h2>
 
 <form asp-action="Login" method="post">
+    @Html.AntiForgeryToken()
     <div class="mb-3">
         <label class="form-label">Потребителско име</label>
         <input name="username" class="form-control" />

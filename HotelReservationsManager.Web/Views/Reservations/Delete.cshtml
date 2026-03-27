@@ -1,4 +1,4 @@
-@model HotelReservationsManager.Data.Models.Reservation
+﻿@model HotelReservationsManager.Data.Models.Reservation
 
 @{
     ViewData["Title"] = "Изтрий резервация";
@@ -14,7 +14,7 @@
         <p class="card-text"><strong>Сума:</strong> @Model.Sum.ToString("C")</p>
         <p class="card-text"><strong>Клиенти:</strong></p>
         <ul>
-            @foreach(var c in Model.Clients)
+            @foreach (var c in Model.Clients)
             {
                 <li>@c.FirstName @c.LastName - @c.Email</li>
             }

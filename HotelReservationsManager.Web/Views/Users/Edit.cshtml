@@ -7,7 +7,9 @@
 <h2>@ViewData["Title"]</h2>
 
 <form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
     <input type="hidden" asp-for="Id" />
+    <input type="hidden" name="originalPasswordHash" value="@ViewBag.OriginalPasswordHash" />
 
     <div class="row">
         <div class="col-md-6">
@@ -15,6 +17,11 @@
                 <label asp-for="Username" class="form-label"></label>
                 <input asp-for="Username" class="form-control" />
                 <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label">Нова парола <small class="text-muted">(оставете празно, за да запазите текущата)</small></label>
+                <input asp-for="Password" class="form-control" type="password" placeholder="(без промяна)" />
+                <span asp-validation-for="Password" class="text-danger"></span>
             </div>
             <div class="mb-3">
                 <label asp-for="Email" class="form-label"></label>
@@ -27,6 +34,11 @@
                 <label asp-for="FirstName" class="form-label"></label>
                 <input asp-for="FirstName" class="form-control" />
                 <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="MiddleName" class="form-label"></label>
+                <input asp-for="MiddleName" class="form-control" />
+                <span asp-validation-for="MiddleName" class="text-danger"></span>
             </div>
             <div class="mb-3">
                 <label asp-for="LastName" class="form-label"></label>
@@ -59,15 +71,23 @@
         <label asp-for="IsActive" class="form-check-label">Активен</label>
     </div>
 
+    <div class="form-check mb-3">
+        <input asp-for="IsAdmin" class="form-check-input" />
+        <label asp-for="IsAdmin" class="form-check-label">Администратор</label>
+    </div>
+
     <div class="mb-3">
-        <label asp-for="LeavingDate" class="form-label"></label>
+        <label asp-for="LeavingDate" class="form-label">Дата на освобождаване (незадължително)</label>
         <input asp-for="LeavingDate" class="form-control datepicker" />
         <span asp-validation-for="LeavingDate" class="text-danger"></span>
     </div>
 
-    <button class="btn btn-primary">Запази</button>
+    <div class="d-flex gap-2">
+        <button class="btn btn-primary">Запази</button>
+        <a asp-action="Index" class="btn btn-secondary">Откажи</a>
+    </div>
 </form>
 
-@section Scripts{
+@section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }

@@ -5,6 +5,7 @@
     ViewData["Title"] = "Потребители";
     var pageSize = ViewBag.PageSize ?? 10;
     var sizes = ViewBag.PageSizeOptions as int[] ?? new[] { 10, 25, 50 };
+    var search = ViewBag.Search as string ?? "";
 }
 
 <div class="card mb-4">
@@ -16,7 +17,7 @@
 
         <form method="get" class="row g-3 mb-3">
             <div class="col-auto">
-                <input type="text" name="search" class="form-control" placeholder="Търси..." />
+                <input type="text" name="search" value="@search" class="form-control" placeholder="Търси..." />
             </div>
             <div class="col-auto">
                 <select name="pageSize" class="form-select">
@@ -36,9 +37,10 @@
                 <thead>
                     <tr>
                         <th>Потребителско име</th>
-                        <th>Име</th>
+                        <th>Три имена</th>
                         <th>Email</th>
                         <th>Активен</th>
+                        <th>Администратор</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -47,12 +49,28 @@
                     {
                         <tr>
                             <td>@u.Username</td>
-                            <td>@u.FirstName @u.LastName</td>
+                            <td>@u.FirstName @u.MiddleName @u.LastName</td>
                             <td>@u.Email</td>
                             <td>@(u.IsActive ? "Да" : "Не")</td>
-                            <td>
+                            <td>@(u.IsAdmin ? "Да" : "Не")</td>
+                            <td class="text-end">
                                 <a class="btn btn-sm btn-outline-warning me-1" asp-action="Edit" asp-route-id="@u.Id">Редактирай</a>
-                                <a class="btn btn-sm btn-outline-info" asp-action="Details" asp-route-id="@u.Id">Детайли</a>
+                                <a class="btn btn-sm btn-outline-info me-1" asp-action="Details" asp-route-id="@u.Id">Детайли</a>
+                                @if (u.IsActive)
+                                {
+                                    <form asp-action="Delete" method="post" class="d-inline"
+                                          onsubmit="return confirm('Деактивирате потребител @u.Username?')">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@u.Id" />
+                                        <button class="btn btn-sm btn-outline-danger me-1">Деактивирай</button>
+                                    </form>
+                                }
+                                <form asp-action="HardDelete" method="post" class="d-inline"
+                                      onsubmit="return confirm('Изтривате ОКОНЧАТЕЛНО потребител @u.Username?')">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@u.Id" />
+                                    <button class="btn btn-sm btn-danger">Изтрий</button>
+                                </form>
                             </td>
                         </tr>
                     }
@@ -65,7 +83,7 @@
                 @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
                 {
                     <li class="page-item @(i == (int)ViewBag.CurrentPage ? "active" : "")">
-                        <a class="page-link" href="@Url.Action("Index", new { page = i, pageSize = pageSize })">@i</a>
+                        <a class="page-link" href="@Url.Action("Index", new { page = i, pageSize = pageSize, search = search })">@i</a>
                     </li>
                 }
             </ul>

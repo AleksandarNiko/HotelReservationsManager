@@ -8,34 +8,47 @@
 
 <h2>@ViewData["Title"] - @client.FirstName @client.LastName</h2>
 
-<div class="card">
+<div class="card mb-3">
     <div class="card-body">
         <p><strong>Email:</strong> @client.Email</p>
         <p><strong>Телефон:</strong> @client.PhoneNumber</p>
         <p><strong>Възрастен:</strong> @(client.IsAdult ? "Да" : "Не")</p>
+    </div>
+</div>
 
-        <h5 class="mt-4">Предишни резервации</h5>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Стая</th>
-                    <th>Настаняване</th>
-                    <th>Освобождаване</th>
-                    <th>Сума</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var r in Model)
-                {
+<div class="card">
+    <div class="card-body">
+        <h5 class="mt-2 mb-3">Предишни резервации</h5>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead>
                     <tr>
-                        <td>@r.Room?.Number</td>
-                        <td>@r.ArrivalDate.ToShortDateString()</td>
-                        <td>@r.DepartureDate.ToShortDateString()</td>
-                        <td>@r.Sum.ToString("C")</td>
+                        <th>Стая №</th>
+                        <th>Настаняване</th>
+                        <th>Освобождаване</th>
+                        <th>Сума</th>
+                        <th></th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model)
+                    {
+                        <tr>
+                            <td>@r.Room?.Number</td>
+                            <td>@r.ArrivalDate.ToShortDateString()</td>
+                            <td>@r.DepartureDate.ToShortDateString()</td>
+                            <td>@r.Sum.ToString("C")</td>
+                            <td>
+                                <a class="btn btn-sm btn-outline-primary"
+                                       asp-controller="Reservations" asp-action="Details" asp-route-id="@r.Id">
+                                    Детайли
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
 
         <nav>
             <ul class="pagination">

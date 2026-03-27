@@ -67,8 +67,13 @@
         <label asp-for="IsActive" class="form-check-label">Активен</label>
     </div>
 
+    <div class="form-check mb-3">
+        <input asp-for="IsAdmin" class="form-check-input" />
+        <label asp-for="IsAdmin" class="form-check-label">Администратор</label>
+    </div>
+
     <div class="mb-3">
-        <label asp-for="LeavingDate" class="form-label"></label>
+        <label asp-for="LeavingDate" class="form-label">Дата на освобождаване (незадължително)</label>
         <input asp-for="LeavingDate" class="form-control datepicker" />
         <span asp-validation-for="LeavingDate" class="text-danger"></span>
     </div>
@@ -76,6 +81,6 @@
     <button class="btn btn-primary">Запази</button>
 </form>
 
-@section Scripts{
+@section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }

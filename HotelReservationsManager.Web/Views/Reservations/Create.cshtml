@@ -10,7 +10,7 @@
     <div class="card-body">
         <h3 class="card-title">@ViewData["Title"]</h3>
 
-        <form asp-action="Create" method="post">
+        <form asp-action="Create" method="post" id="reservationForm">
             @Html.AntiForgeryToken()
 
             <div class="mb-3">
@@ -26,7 +26,7 @@
                 <select asp-for="SelectedClientIds" class="form-select select2-multiple" multiple size="6" name="SelectedClientIds">
                     @foreach (var c in (IEnumerable<Client>)ViewBag.Clients)
                     {
-                        <option value="@c.Id">@c.FirstName @c.LastName (@c.Email)</option>
+                        <option value="@c.Id">@c.FirstName @c.LastName (@(c.IsAdult ? "Възрастен" : "Дете"))</option>
                     }
                 </select>
                 <span asp-validation-for="SelectedClientIds" class="text-danger"></span>
@@ -35,24 +35,30 @@
             <div class="row">
                 <div class="col-md-4 mb-3">
                     <label asp-for="CheckInDate" class="form-label">Дата на настаняване</label>
-                    <input asp-for="CheckInDate" class="form-control datepicker" />
+                    <input asp-for="CheckInDate" class="form-control datepicker" id="checkInDate" />
                     <span asp-validation-for="CheckInDate" class="text-danger"></span>
                 </div>
                 <div class="col-md-4 mb-3">
                     <label asp-for="CheckOutDate" class="form-label">Дата на освобождаване</label>
-                    <input asp-for="CheckOutDate" class="form-control datepicker" />
+                    <input asp-for="CheckOutDate" class="form-control datepicker" id="checkOutDate" />
                     <span asp-validation-for="CheckOutDate" class="text-danger"></span>
                 </div>
             </div>
 
             <div class="form-check mb-3">
-                <input asp-for="HasBreakfast" class="form-check-input" />
-                <label asp-for="HasBreakfast" class="form-check-label">Закуска</label>
+                <input asp-for="HasBreakfast" class="form-check-input" id="hasBreakfast" />
+                <label asp-for="HasBreakfast" class="form-check-label">Закуска (+15 лв/нощ)</label>
             </div>
 
             <div class="form-check mb-3">
-                <input asp-for="IsAllInclusive" class="form-check-input" />
-                <label asp-for="IsAllInclusive" class="form-check-label">All Inclusive</label>
+                <input asp-for="IsAllInclusive" class="form-check-input" id="isAllInclusive" />
+                <label asp-for="IsAllInclusive" class="form-check-label">All Inclusive (+40 лв/нощ)</label>
+            </div>
+
+            <!-- Live price preview -->
+            <div class="alert alert-info mb-3" id="pricePreview" style="display:none;">
+                <strong>Изчислена дължима сума: </strong>
+                <span id="priceValue" class="fs-5 fw-bold"></span>
             </div>
 
             <div class="d-flex gap-2">
@@ -65,4 +71,45 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        function recalcPrice() {
+            var roomId = parseInt($('#RoomId').val());
+            var clientIds = $('select[name="SelectedClientIds"]').val() || [];
+            var checkIn = $('#checkInDate').val();
+            var checkOut = $('#checkOutDate').val();
+            var hasBreakfast = $('#hasBreakfast').is(':checked');
+            var isAllInclusive = $('#isAllInclusive').is(':checked');
+
+            if (!roomId || clientIds.length === 0 || !checkIn || !checkOut) {
+                $('#pricePreview').hide();
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("CalculatePrice", "Reservations")',
+                method: 'POST',
+                contentType: 'application/json',
+                headers: { 'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val() },
+                data: JSON.stringify({
+                    roomId: roomId,
+                    clientIds: clientIds.map(Number),
+                    checkIn: checkIn,
+                    checkOut: checkOut,
+                    hasBreakfast: hasBreakfast,
+                    isAllInclusive: isAllInclusive
+                }),
+                success: function(r) {
+                    if (r.sum !== undefined) {
+                        $('#priceValue').text(r.sum.toFixed(2) + ' лв.');
+                        $('#pricePreview').show();
+                    }
+                }
+            });
+        }
+
+        $(function() {
+            $('#RoomId, select[name="SelectedClientIds"], #hasBreakfast, #isAllInclusive').on('change', recalcPrice);
+            $('#checkInDate, #checkOutDate').on('change', recalcPrice);
+        });
+    </script>
 }
