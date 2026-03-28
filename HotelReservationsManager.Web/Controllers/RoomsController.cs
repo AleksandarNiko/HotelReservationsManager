@@ -47,6 +47,7 @@ namespace HotelReservationsManager.Web.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Room room)
         {
             if (ModelState.IsValid)
@@ -69,6 +70,7 @@ namespace HotelReservationsManager.Web.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Room room)
         {
             if (!ModelState.IsValid) return View(room);
@@ -79,6 +81,7 @@ namespace HotelReservationsManager.Web.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
             var room = await _context.Rooms.FindAsync(id);

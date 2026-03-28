@@ -26,6 +26,9 @@ namespace HotelReservationsManager.Web.Controllers
         {
             try
             {
+                var allowedSizes = new[] { 10, 25, 50 };
+                if (!allowedSizes.Contains(pageSize)) pageSize = 10;
+
                 var query = _context.Reservations
                     .Include(r => r.Room)
                     .Include(r => r.Clients)
@@ -41,6 +44,9 @@ namespace HotelReservationsManager.Web.Controllers
 
                 ViewBag.TotalPages = (int)Math.Ceiling((double)total / pageSize);
                 ViewBag.CurrentPage = page;
+                ViewBag.PageSize = pageSize;
+                ViewBag.PageSizeOptions = allowedSizes;
+                ViewBag.Search = search;
 
                 return View(items);
             }
@@ -67,27 +73,21 @@ namespace HotelReservationsManager.Web.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    // log model state errors for debugging
                     foreach (var kv in ModelState)
-                    {
                         foreach (var err in kv.Value.Errors)
-                        {
                             _logger.LogWarning("ModelState error for {Key}: {Error}", kv.Key, err.ErrorMessage);
-                        }
-                    }
                 }
                 if (ModelState.IsValid)
                 {
                     var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
                     if (string.IsNullOrEmpty(idClaim))
                     {
-                        _logger.LogWarning("Unable to find NameIdentifier claim for user when creating reservation.");
+                        _logger.LogWarning("Unable to find NameIdentifier claim.");
                         return Challenge();
                     }
-
                     if (!int.TryParse(idClaim, out var userId))
                     {
-                        _logger.LogWarning("Invalid NameIdentifier claim value: {Value}", idClaim);
+                        _logger.LogWarning("Invalid NameIdentifier: {Value}", idClaim);
                         return Problem("User identity is invalid.");
                     }
 
@@ -96,7 +96,6 @@ namespace HotelReservationsManager.Web.Controllers
 
                     ModelState.AddModelError("", "Стаята вече не е свободна.");
                 }
-                // repopulate selects
                 ViewBag.Rooms = await _context.Rooms.Where(r => r.IsFree).ToListAsync();
                 ViewBag.Clients = await _context.Clients.ToListAsync();
                 return View(model);
@@ -137,10 +136,10 @@ namespace HotelReservationsManager.Web.Controllers
                 IsAllInclusive = res.IsAllInclusive
             };
 
-            // include current room even if it's not free so user can keep it
             ViewBag.Rooms = await _context.Rooms.Where(r => r.IsFree || r.Id == res.RoomId).ToListAsync();
             ViewBag.Clients = await _context.Clients.ToListAsync();
             ViewBag.ReservationId = id;
+            ViewBag.CurrentSum = res.Sum;
             return View(model);
         }
 
@@ -162,7 +161,6 @@ namespace HotelReservationsManager.Web.Controllers
                 .FirstOrDefaultAsync(r => r.Id == id);
             if (reservation == null) return NotFound();
 
-            // If room changed, ensure new room is free
             if (reservation.RoomId != model.RoomId)
             {
                 var newRoom = await _context.Rooms.FindAsync(model.RoomId);
@@ -174,13 +172,7 @@ namespace HotelReservationsManager.Web.Controllers
                     ViewBag.ReservationId = id;
                     return View(model);
                 }
-
-                // free old room
-                if (reservation.Room != null)
-                {
-                    reservation.Room.IsFree = true;
-                }
-                // occupy new
+                if (reservation.Room != null) reservation.Room.IsFree = true;
                 newRoom.IsFree = false;
                 reservation.RoomId = model.RoomId;
             }
@@ -190,13 +182,17 @@ namespace HotelReservationsManager.Web.Controllers
             reservation.HasBreakfast = model.HasBreakfast;
             reservation.IsAllInclusive = model.IsAllInclusive;
 
-            // update clients
             reservation.Clients.Clear();
             var clients = await _context.Clients.Where(c => model.SelectedClientIds.Contains(c.Id)).ToListAsync();
             foreach (var c in clients) reservation.Clients.Add(c);
 
-            // recalc sum
-            reservation.Sum = await _resService.CalculatePrice(reservation.RoomId, reservation.Clients.Select(c => c.Id).ToList(), reservation.ArrivalDate, reservation.DepartureDate, reservation.HasBreakfast, reservation.IsAllInclusive);
+            reservation.Sum = await _resService.CalculatePrice(
+                reservation.RoomId,
+                reservation.Clients.Select(c => c.Id).ToList(),
+                reservation.ArrivalDate,
+                reservation.DepartureDate,
+                reservation.HasBreakfast,
+                reservation.IsAllInclusive);
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
@@ -222,13 +218,44 @@ namespace HotelReservationsManager.Web.Controllers
                 .FirstOrDefaultAsync(r => r.Id == id);
             if (res == null) return NotFound();
 
-            if (res.Room != null)
-            {
-                res.Room.IsFree = true;
-            }
+            if (res.Room != null) res.Room.IsFree = true;
             _context.Reservations.Remove(res);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+        // AJAX endpoint for live price calculation
+        [HttpPost]
+        public async Task<IActionResult> CalculatePrice([FromBody] PriceCalculationRequest req)
+        {
+            if (req == null || req.RoomId <= 0 || req.ClientIds == null || !req.ClientIds.Any())
+                return Json(new { sum = 0m });
+
+            try
+            {
+                var sum = await _resService.CalculatePrice(
+                    req.RoomId,
+                    req.ClientIds,
+                    req.CheckIn,
+                    req.CheckOut,
+                    req.HasBreakfast,
+                    req.IsAllInclusive);
+                return Json(new { sum });
+            }
+            catch
+            {
+                return Json(new { sum = 0m });
+            }
+        }
+    }
+
+    public class PriceCalculationRequest
+    {
+        public int RoomId { get; set; }
+        public List<int> ClientIds { get; set; } = new();
+        public DateTime CheckIn { get; set; }
+        public DateTime CheckOut { get; set; }
+        public bool HasBreakfast { get; set; }
+        public bool IsAllInclusive { get; set; }
     }
 }

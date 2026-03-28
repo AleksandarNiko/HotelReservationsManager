@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace HotelReservationsManager.Web.Controllers
 {
@@ -13,15 +15,24 @@ namespace HotelReservationsManager.Web.Controllers
 
         public AccountController(HotelReservationsManagerDbContext context) => _context = context;
 
+        public static string HashPassword(string password)
+        {
+            using var sha = SHA256.Create();
+            var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
+            return Convert.ToBase64String(bytes);
+        }
+
         [HttpGet]
         public IActionResult Login() => View();
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(string username, string password)
         {
-            // 1. Търсим потребителя и проверяваме дали е активен
+            var hashed = HashPassword(password);
+
             var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Username == username && u.Password == password);
+                .FirstOrDefaultAsync(u => u.Username == username && u.Password == hashed);
 
             if (user == null)
             {
@@ -35,8 +46,7 @@ namespace HotelReservationsManager.Web.Controllers
                 return View();
             }
 
-            // 2. Дефинираме ролята (Админът е с username "admin" по задание)
-            string role = (user.Username.ToLower() == "admin") ? "Admin" : "Employee";
+            string role = user.IsAdmin ? "Admin" : "Employee";
 
             var claims = new List<Claim>
             {
@@ -58,6 +68,7 @@ namespace HotelReservationsManager.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
