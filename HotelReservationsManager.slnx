@@ -10,6 +10,7 @@
     <Project Path="HotelReservationsManager.Services.Tests/HotelReservationsManager.Services.Tests.csproj" />
   </Folder>
   <Folder Name="/Web/">
+    <Project Path="HotelReservationsManager.ViewModels/HotelReservationsManager.ViewModels.csproj" />
     <Project Path="HotelReservationsManager.Web/HotelReservationsManager.Web.csproj" />
   </Folder>
   <Project Path="HotelReservationsManager.Common/HotelReservationsManager.Common.csproj" />
